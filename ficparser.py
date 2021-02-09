@@ -104,14 +104,26 @@ class FicParser(commands.Cog):
         pos = r_text.find("round ")
         info["round"] = chapter.text[pos:].split("\n")[0]
 
-        pos = r_text.find("word count: ")
+        # The vast majority of people go
+        # Word Count: nnnn
+        pos = r_text.find("word count")
         if pos != -1:
-            pos += 12
-            info["wordcount"] = r_text[pos:pos+4]
-        pos = r_text.find("wordcount: ")
+            pos += 10
+            local = r_text[pos:]
+            pos = local.find(":")
+            if pos != -1:
+                info["wordcount"] = local[pos+1:].split()[0].strip()
+        pos = r_text.find("wordcount")
         if pos != -1:
-            pos += 11
-            info["wordcount"] = r_text[pos:pos+4]
+            pos += 9
+            local = r_text[pos:]
+            pos = local.find(":")
+            if pos != -1:
+                info["wordcount"] = local[pos+1:].split()[0].strip()
+        
+        if info["wordcount"] == "Unknown":
+            # It wasn't an easy check, let's estimate
+            info["wordcount"] = str(story.wordcount / story.chapter_count) + " (Likely an overestimate)"
             
         return info
 
