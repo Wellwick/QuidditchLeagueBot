@@ -103,6 +103,15 @@ class FicParser(commands.Cog):
 
         pos = r_text.find("round ")
         info["round"] = chapter.text[pos:].split("\n")[0]
+
+        pos = r_text.find("word count: ")
+        if pos != -1:
+            pos += 12
+            info["wordcount"] = r_text[pos:pos+4]
+        pos = r_text.find("wordcount: ")
+        if pos != -1:
+            pos += 11
+            info["wordcount"] = r_text[pos:pos+4]
             
         return info
 
