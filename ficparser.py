@@ -30,7 +30,7 @@ class FicParser(commands.Cog):
             "Beater 2",
             "Seeker"
         ]
-        self.replacements = [
+        self.replacements = {
             "one": "1",
             "two": "2",
             "three": "3",
@@ -44,7 +44,7 @@ class FicParser(commands.Cog):
             "eleven": "11",
             "twelve": "12",
             "thirteen": "13",
-        ]
+        }
 
     def get_ql_fic(self, id, chapter):
         story = Story(id=int(id))
