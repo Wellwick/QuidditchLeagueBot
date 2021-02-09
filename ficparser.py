@@ -93,9 +93,9 @@ class FicParser(commands.Cog):
                 info["position"] = i
 
         print("Checking for team")
-        lowest_pos = len(c_text)
+        lowest_pos = len(r_text)
         for i in self.teams:
-            pos = c_text.find(i.lower())
+            pos = r_text.find(i.lower())
             if pos != -1 and pos < lowest_pos:
                 lowest_pos = pos
                 info["team"] = i
