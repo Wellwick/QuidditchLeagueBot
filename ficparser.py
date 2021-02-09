@@ -1,6 +1,7 @@
 
 from discord.ext import commands
 from ff.fiction import Story, Chapter, User
+import re
 
 class FicParser(commands.Cog):
     def __init__(self):
@@ -99,6 +100,9 @@ class FicParser(commands.Cog):
             if pos != -1 and pos < lowest_pos:
                 lowest_pos = pos
                 info["team"] = i
+
+        pos = r_text.find("round ")
+        info["round"] = chapter.text[pos:].split("\n")[0]
             
         return info
 
