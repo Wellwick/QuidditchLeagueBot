@@ -72,13 +72,18 @@ class FicParser(commands.Cog):
             "wordcount": "Unknown"
         }
         
+        print("Checking for QL")
         for i in ["qlfc", "quidditch league"]:
             if i in c_text:
                 info["forql"] = True
+            if i in story.description:
+                info["forql"] = True
 
         if not info["forql"]:
+            print("Not a QL fic")
             return info
 
+        print("Checking for position")
         lowest_pos = len(r_text)
         for i in self.positions:
             pos = r_text.find(i.lower())
@@ -86,6 +91,7 @@ class FicParser(commands.Cog):
                 lowest_pos = pos
                 info["position"] = i
 
+        print("Checking for team")
         lowest_pos = len(c_text)
         for i in self.teams:
             pos = c_text.find(i.lower())
