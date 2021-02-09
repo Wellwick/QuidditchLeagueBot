@@ -1,6 +1,6 @@
 import pickle, os.path, datetime, random, difflib
 from googleapiclient.discovery import build
-from google.oauth2 import service_account as service_account
+from google.oauth2 import service_account as s_a
 
 SECRET = os.path.join(os.getcwd(), "gsecret.json")
 SCOPES = ['https://www.googleapis.com/auth/drive']
