@@ -44,6 +44,7 @@ class FicParser(commands.Cog):
             "eleven": "11",
             "twelve": "12",
             "thirteen": "13",
+            "Tornadoes": "Tornados",
         }
 
     def get_ql_fic(self, id, chap):
