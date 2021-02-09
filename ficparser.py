@@ -76,7 +76,7 @@ class FicParser(commands.Cog):
         for i in ["qlfc", "quidditch league"]:
             if i in c_text:
                 info["forql"] = True
-            if i in story.description:
+            if i in story.description.lower():
                 info["forql"] = True
 
         if not info["forql"]:
