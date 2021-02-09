@@ -123,7 +123,7 @@ class FicParser(commands.Cog):
         
         if info["wordcount"] == "Unknown":
             # It wasn't an easy check, let's estimate
-            info["wordcount"] = str(story.wordcount / story.chapter_count) + " (Likely an overestimate)"
+            info["wordcount"] = str(story.word_count / story.chapter_count) + " (Likely an overestimate)"
             
         return info
 
