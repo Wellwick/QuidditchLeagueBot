@@ -1,5 +1,6 @@
 
 from discord.ext import commands
+from discord import Embed
 from ff.fiction import Story, Chapter, User
 import re
 
@@ -64,6 +65,8 @@ class FicParser(commands.Cog):
             r_text = c_text.replace(i, self.replacements[i])
         info = {
             "forql": False,
+            "story": story,
+            "author": author,
             "title": story.title,
             "url": story.url + "/" + str(chap),
             "season": "9",
@@ -142,4 +145,5 @@ class FicParser(commands.Cog):
         info = self.get_ql_fic(id, chapter)
         if info["forql"]:
             # I think this is for Quidditch League
-            await ctx.send("I think this fic is for Quidditch League\n" + str(info))
+            emb = Embed(title=info["title"], url=info["url"])
+            await ctx.send(embed=emb)
