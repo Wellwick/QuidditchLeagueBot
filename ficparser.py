@@ -131,7 +131,9 @@ class FicParser(commands.Cog):
 
         split_text = chapter.text.split("\n")
         for i in split_text:
-            if self.prompt_re.match(i.lower()):
+            # We can assume that there isn't going to be a prompt more than 80
+            # characters long, right? They can get quite long...
+            if self.prompt_re.match(i.lower()) and len(i) < 80:
                 info["o_prompts"] += [i]
             
         return info
