@@ -151,5 +151,10 @@ class FicParser(commands.Cog):
                 description=info["story"].description
             )
             emb.set_author(name=info["author"].username, url="https://www.fanfiction.net/u/" + str(info["story"].author_id))
-            emb.set_footer(text=info["team"] + ", " + info["position"])
+            emb.set_footer(text="Season " + info["season"] + ", " + info["round"])
+            emb.add_field(name="Wordcount", value=info["wordcount"], inline=True)
+            emb.add_field(name="Team", value=info["team"], inline=True)
+            emb.add_field(name="Position", value=info["position"], inline=True)
+            if len(info["o_prompts"]) > 0:
+                emb.add_field(name="Prompts", value=", ".join(info["o_prompts"]), inline=False)
             await ctx.send(embed=emb)
