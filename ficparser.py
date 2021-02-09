@@ -129,7 +129,7 @@ class FicParser(commands.Cog):
         split_text = chapter.text.split("\n")
         for i in split_text:
             if self.prompt_re.match(i.lower()):
-                self.o_prompts += [i]
+                info["o_prompts"] += [i]
             
         return info
 
