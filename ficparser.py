@@ -145,7 +145,11 @@ class FicParser(commands.Cog):
         info = self.get_ql_fic(id, chapter)
         if info["forql"]:
             # I think this is for Quidditch League
-            emb = Embed(title=info["title"], url=info["url"])
-            emb.add_field(name="author", value="by " + info["author"].username, inline=False)
-            emb.add_field(name="fic-description", value=info["story"].description, inline=True)
+            emb = Embed(
+                title=info["title"], 
+                url=info["url"], 
+                description=info["story"].description,
+                author=info["author"].username,
+                footer=info["team"] + ", " + info["position"]
+            )
             await ctx.send(embed=emb)
