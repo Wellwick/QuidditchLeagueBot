@@ -47,15 +47,18 @@ class FicParser(commands.Cog):
         }
 
     def get_ql_fic(self, id, chap):
+        print("Getting story " + str(id))
         story = Story(id=int(id))
         story.download_data()
         author = User(id=story.author_id)
         author.download_data()
+        print("Getting chapter " + str(chap))
         chapter = Chapter(story_id=story.id, chapter=int(chap))
         # Now we have the information, it's time to get processing
         c_text = chapter.text.lower()
+        print("Doing replacements")
         for i in self.replacements.keys():
-            c_text = c_text.replace(i, self.replacements[i])
+            r_text = c_text.replace(i, self.replacements[i])
         info = {
             "forql": False,
             "title": story.title,
@@ -76,9 +79,9 @@ class FicParser(commands.Cog):
         if not info["forql"]:
             return info
 
-        lowest_pos = len(c_text)
+        lowest_pos = len(r_text)
         for i in self.positions:
-            pos = c_text.find(i.lower())
+            pos = r_text.find(i.lower())
             if pos != -1 and pos < lowest_pos:
                 lowest_pos = pos
                 info["position"] = i
