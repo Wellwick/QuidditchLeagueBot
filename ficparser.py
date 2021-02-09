@@ -150,6 +150,6 @@ class FicParser(commands.Cog):
                 url=info["url"], 
                 description=info["story"].description
             )
-            emb.set_author(name=info["author"].username, url="https://www.fanfiction.net/u/" + info["story"].author_id)
+            emb.set_author(name=info["author"].username, url="https://www.fanfiction.net/u/" + str(info["story"].author_id))
             emb.set_footer(text=info["team"] + ", " + info["position"])
             await ctx.send(embed=emb)
