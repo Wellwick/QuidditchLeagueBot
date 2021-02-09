@@ -47,6 +47,7 @@ class FicParser(commands.Cog):
             "thirteen": "13",
             "tornadoes": "tornados",
         }
+        self.prompt_re = re.compile(".*(\[|\()[a-z]+(\]|\)).*")
 
     def get_ql_fic(self, id, chap):
         print("Getting story " + str(id))
@@ -124,6 +125,11 @@ class FicParser(commands.Cog):
         if info["wordcount"] == "Unknown":
             # It wasn't an easy check, let's estimate
             info["wordcount"] = str(story.word_count / story.chapter_count) + " (Likely an overestimate)"
+
+        split_text = chapter.text.split("\n")
+        for i in split_text:
+            if self.prompt_re.match(i.lower()):
+                self.o_prompts += [i]
             
         return info
 
