@@ -46,12 +46,12 @@ class FicParser(commands.Cog):
             "thirteen": "13",
         }
 
-    def get_ql_fic(self, id, chapter):
+    def get_ql_fic(self, id, chap):
         story = Story(id=int(id))
         story.download_data()
         author = User(id=story.author_id)
         author.download_data()
-        chapter = Chapter(story_id=story.id, chapter=int(chapter))
+        chapter = Chapter(story_id=story.id, chapter=int(chap))
         # Now we have the information, it's time to get processing
         c_text = chapter.text.lower()
         for i in self.replacements.keys():
@@ -59,7 +59,7 @@ class FicParser(commands.Cog):
         info = {
             "forql": False,
             "title": story.title,
-            "url": story.url + "/" + str(chapter),
+            "url": story.url + "/" + str(chap),
             "season": "9",
             "round": "Unknown",
             "position": "Unknown",
@@ -68,7 +68,6 @@ class FicParser(commands.Cog):
             "o_prompts": [],
             "wordcount": "Unknown"
         }
-        lowest_pos = len(c_text)
         
         for i in ["qlfc", "quidditch league"]:
             if i in c_text:
@@ -77,11 +76,19 @@ class FicParser(commands.Cog):
         if not info["forql"]:
             return info
 
+        lowest_pos = len(c_text)
         for i in self.positions:
             pos = c_text.find(i.lower())
             if pos != -1 and pos < lowest_pos:
                 lowest_pos = pos
                 info["position"] = i
+
+        lowest_pos = len(c_text)
+        for i in self.teams:
+            pos = c_text.find(i.lower())
+            if pos != -1 and pos < lowest_pos:
+                lowest_pos = pos
+                info["team"] = i
             
         return info
 
