@@ -169,6 +169,7 @@ class FicPoster(commands.Cog):
 
     async def check_for_fics(self):
         await self.bot.wait_until_ready()
+        await self.setup_post_channels()
         while(True):
             # Something
             fics = self.mail.get_latest()
