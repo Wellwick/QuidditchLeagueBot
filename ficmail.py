@@ -4,7 +4,7 @@ from email.header import decode_header
 from email.utils import parseaddr
 import json
 
-class Email():
+class FicMail():
     def __init__(self):
         SERVER = "pop.gmail.com"
         with open("email.json", "r") as email_file:
