@@ -163,6 +163,7 @@ class FicPoster(commands.Cog):
             await ctx.send("Seems there are no subscribed channels")
 
     async def send_notifications(self, team, emb):
+        print("Sending notifications")
         for channel in self.channel_posts[team]:
             await channel.send(embed=emb)
 
@@ -175,6 +176,7 @@ class FicPoster(commands.Cog):
                 print("Outputting " + str(len(fics)) + " fics")
             for fic in fics:
                 info = self.parser.get_ql_fic(fic["id"], fic["chapter"])
+                print("Info collected!")
                 emb = self.parser.get_embed(info)
                 if emb != None:
                     await self.send_notifications(info["team"], emb)

@@ -55,21 +55,24 @@ class FicMail():
         print("Messages parsed")
         for message in messages:
             if "Chapter:" in message['subject'] or "Story:" in message['subject']:
-                # Should also make sure it's from the bot, but not for now
-                # Get the fanfiction page address
-                #text = str(message)
-                text = self.get_text(message)
-                index = text.index("https://www.fanfiction.net/s/")
-                text = text[index:]
-                index = text.index("\n")
-                text = text[:index]
-                split = text.split("/")
-                storyid = split[4]
-                chapter = split[5]
-                latest_emails += [ {
-                    "id": storyid,
-                    "chapter": chapter
-                }]
+                try:
+                    # Should also make sure it's from the bot, but not for now
+                    # Get the fanfiction page address
+                    text = self.get_text(message)
+                    index = text.index("https://www.fanfiction.net/s/")
+                    text = text[index:]
+                    index = text.index("\n")
+                    text = text[:index]
+                    split = text.split("/")
+                    storyid = split[4]
+                    chapter = split[5]
+                    latest_emails += [ {
+                        "id": storyid,
+                        "chapter": chapter
+                    }]
+                except:
+                    # Unfortunately, bad parsing can happen...
+                    pass
         print("Updating count")
         self.info["count"] = email_count
         with open("email-info.json", "w") as email_info_file:
