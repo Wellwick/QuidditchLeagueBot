@@ -164,7 +164,10 @@ class FicPoster(commands.Cog):
 
     async def send_notifications(self, team, emb):
         for channel in self.channel_posts[team]:
-            await channel.send(embed=emb)
+            try:
+                await channel.send(embed=emb)
+            except:
+                print("Failed to send to channel " + channel.name + " on guild " + channel.guild.name)
         print("Notifications sent!")
 
     async def check_for_fics(self):
