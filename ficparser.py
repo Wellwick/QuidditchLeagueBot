@@ -107,6 +107,9 @@ class FicParser(commands.Cog):
 
         pos = r_text.find("round ")
         info["round"] = chapter.text[pos:].split("\n")[0]
+        if info["round"] == "Unknown" or len(info["round"]) > 50:
+            pos = r_text.find("prophet challenge")
+            info["round"] = chapter.text["pos:"].split("\n")[0]
 
         # The vast majority of people go
         # Word Count: nnnn
