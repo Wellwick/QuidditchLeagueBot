@@ -69,7 +69,7 @@ class FicPoster(commands.Cog):
             return False
 
     @commands.command()
-    async def posthere(self, ctx, *, teams=", ".join(self.posting["teams"])):
+    async def posthere(self, ctx, *, teams="All Teams"):
         """
             Request that updates of when people post Quidditch Leagues stories
             is sent to this channel. Only one posting channel per server is
@@ -82,6 +82,8 @@ class FicPoster(commands.Cog):
             e.g.
             %posthere Caerphilly Catapults, Puddlemere United, Unknown
         """
+        if teams == "All Teams":
+            teams = ", ".join(self.posting["teams"])
         if teams.strip().lower() == "list":
             # They only want a list of teams
             await ctx.send("The list of teams to check for are: " + ", ".join(self.posting["teams"]))
