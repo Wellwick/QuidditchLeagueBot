@@ -66,6 +66,8 @@ class FicMail():
                     "chapter": chapter
                 }]
         self.info["count"] = email_count
+        with open("email-info.json", "r") as email_info_file:
+            json.dump(self.info, email_info_file)
         # This is not the end of the work, but it is all that will be done in
         # this class. The parsing of the information will have to be done
         # elsewhere!

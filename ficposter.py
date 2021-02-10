@@ -1,6 +1,8 @@
 from discord.ext import commands
 import json
 import difflib
+import ficmail
+import ficparser
 
 class FicPoster(commands.Cog):
     def __init__(self, bot):
@@ -36,6 +38,9 @@ class FicPoster(commands.Cog):
             self.channel_posts[i] = []
         
         self.ready = False
+        self.mail = ficmail.FicMail()
+        self.parser = ficparser.FicParser()
+        self.bot.add_cog(self.parser)
 
     async def setup_post_channels(self):
         if self.ready:
@@ -133,13 +138,16 @@ class FicPoster(commands.Cog):
         await self.setup_post_channels()
         if self.clear_subscription(ctx.guild):
             self.write_file()
+            await ctx.send("You will receive no more notifications on this server")
         else:
             await ctx.send("It doesn't seem this server is subscribed for fic notifications.")
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def pingchannels(self, ctx, *args):
         """Pings all the subscribed channels, very annoying
         """
+        if ctx.author.id != "227834498019098624":
+            return
         await self.setup_post_channels()
         chans = []
         for i in self.channel_posts:
@@ -148,7 +156,27 @@ class FicPoster(commands.Cog):
                     chans += [j]
 
         for chan in chans:
-            await chan.send("I'm posting here because of a %pingchannels command!")
+            await chan.send("This is a test message to make sure you are subscribed, please ignore it!")
         
         if len(chans) == 0:
             await ctx.send("Seems there are no subscribed channels")
+
+    async def send_notifications(self, team, emb):
+        for channel in self.channel_posts[team]:
+            await channel.send(embed=emb)
+
+    async def check_for_fics(self):
+        await self.bot.wait_until_ready()
+        while(True):
+            try:
+                # Something
+                fics = self.mail.get_latest()
+                for fic in fics:
+                    info = self.parser.get_ql_fic(id, chapter)
+                    emb = self.parser.get_embed(info)
+                    if emb != None:
+                        await self.send_notifications(info["team"], emb)
+            except:
+                # Something else
+                pass
+            await asyncio.sleep(60)

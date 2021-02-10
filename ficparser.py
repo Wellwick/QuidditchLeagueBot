@@ -138,13 +138,10 @@ class FicParser(commands.Cog):
             
         return info
 
-    @commands.command()
-    async def ql(self, ctx, id, chapter):
+    def get_embed(self, info):
+        """Returns an embed for a given fic id and chapter, as long as it is for
+        Quidditch League
         """
-            Takes an input and tries to get what the the season, round, prompts,
-            word count, position, team
-        """
-        info = self.get_ql_fic(id, chapter)
         if info["forql"]:
             # I think this is for Quidditch League
             emb = Embed(
@@ -159,4 +156,19 @@ class FicParser(commands.Cog):
             emb.add_field(name="Position", value=info["position"], inline=True)
             if len(info["o_prompts"]) > 0:
                 emb.add_field(name="Prompts", value=", ".join(info["o_prompts"]), inline=False)
+            return emb
+        else:
+            return None
+
+    @commands.command(hidden=True)
+    async def ql(self, ctx, id, chapter):
+        """
+            Takes an input and tries to get what the the season, round, prompts,
+            word count, position, team
+        """
+        info = self.get_ql_fic(id, chapter)
+        emb = self.get_embed(info)
+        if emb != None:
             await ctx.send(embed=emb)
+        else:
+            await ctx.send("Does not look like a Quidditch League fic")

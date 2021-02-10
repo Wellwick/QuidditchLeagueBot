@@ -27,8 +27,11 @@ async def hi(ctx, *args):
     await ctx.send('Hi, <@' + str(ctx.author.id) + '>!')
 
 
-b.add_cog(ficparser.FicParser())
-b.add_cog(ficposter.FicPoster(b))
+# This will also add the FicParser cog itself!
+poster = ficposter.FicPoster(b)
+b.add_cog(poster)
+b.loop.create_task(poster.check_for_fics())
+
 
 with open('secret') as s:
     token = s.read()[:-1]
