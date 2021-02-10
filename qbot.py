@@ -9,6 +9,7 @@ from discord.ext import commands
 import asyncio, sys
 import sheets
 import ficparser
+import ficposter
 
 '''My (Quidditch League Bot's) Main Script
 I'm friendly, and I have commands to support the Quidditch League discord server
@@ -27,6 +28,7 @@ async def hi(ctx, *args):
 
 
 b.add_cog(ficparser.FicParser())
+b.add_cog(ficposter.FicPoster(b))
 
 with open('secret') as s:
     token = s.read()[:-1]
