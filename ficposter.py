@@ -34,14 +34,6 @@ class FicPoster(commands.Cog):
         self.channel_posts = {}
         for i in self.posting["teams"]:
             self.channel_posts[i] = []
-
-        for i in self.posting["post_channels"]:
-            # These have a guild, channel id and list of teams that we must
-            # resolve here
-            guild = self.bot.get_guild(i["guild"])
-            chan = guild.get_channel(i["channel"])
-            for team in i["teams"]:
-                self.channel_posts[team] += [ chan ]
         
         self.ready = False
 
@@ -132,8 +124,6 @@ class FicPoster(commands.Cog):
         if len(unrecognized) > 0:
             string += "\n\nUnfortunately, I didn't recognize: **" + "**, **".join(unrecognized) + "**"
         await ctx.send(string)
-
-
 
     @commands.command()
     async def poststop(self, ctx, *args):
