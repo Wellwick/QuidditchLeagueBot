@@ -133,7 +133,7 @@ class FicMail():
                 #print('%spart %s' % (' ' * indent_number, n))
                 #print('%s--------------------' % (' ' * indent_number))
                 # print multiple part information by invoke print_info function recursively.
-                self.get_text(part, indent + 1)
+                self.get_text(part, indent_number + 1)
         # if not multiple part. 
         else:
             # get message content mime type
