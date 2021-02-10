@@ -40,7 +40,7 @@ class FicMail():
         print("Have some new emails!")
         # If we've got to this point, we need to read some emails.
         # They might not be from fanfiction.net though
-        messages = [pop_conn.retr(i) for i in range(self.info["count"], email_count + 1)]
+        messages = [pop_conn.retr(i) for i in range(self.info["count"] + 1, email_count + 1)]
         n_messages = []
         for message in messages:
             new = [mssg.decode("utf-8") for mssg in message[1]]
@@ -68,7 +68,7 @@ class FicMail():
                     "id": storyid,
                     "chapter": chapter
                 }]
-        self.info["count"] = email_count + 1
+        self.info["count"] = email_count
         with open("email-info.json", "w") as email_info_file:
             json.dump(self.info, email_info_file)
         # This is not the end of the work, but it is all that will be done in
