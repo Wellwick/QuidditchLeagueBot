@@ -169,17 +169,13 @@ class FicPoster(commands.Cog):
     async def check_for_fics(self):
         await self.bot.wait_until_ready()
         while(True):
-            try:
-                # Something
-                fics = self.mail.get_latest()
-                if len(fics) > 0:
-                    print("Outputting " + str(len(fics)) + " fics")
-                for fic in fics:
-                    info = self.parser.get_ql_fic(id, chapter)
-                    emb = self.parser.get_embed(info)
-                    if emb != None:
-                        await self.send_notifications(info["team"], emb)
-            except:
-                # Something else
-                pass
+            # Something
+            fics = self.mail.get_latest()
+            if len(fics) > 0:
+                print("Outputting " + str(len(fics)) + " fics")
+            for fic in fics:
+                info = self.parser.get_ql_fic(id, chapter)
+                emb = self.parser.get_embed(info)
+                if emb != None:
+                    await self.send_notifications(info["team"], emb)
             await asyncio.sleep(60)
