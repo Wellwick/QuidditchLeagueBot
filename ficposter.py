@@ -56,7 +56,7 @@ class FicPoster(commands.Cog):
         """
         subscription = None
         for i in self.posting["post_channels"]:
-            if guild == i["guild"]:
+            if guild.id == i["guild"]:
                 subscription = i
                 chan = guild.get_channel(i["channel"])
                 for team in i["teams"]:
@@ -86,7 +86,7 @@ class FicPoster(commands.Cog):
             teams = ", ".join(self.posting["teams"])
         if teams.strip().lower() == "list":
             # They only want a list of teams
-            await ctx.send("The list of teams to check for are: " + ", ".join(self.posting["teams"]))
+            await ctx.send("The list of teams to check for are: **" + "**, **".join(self.posting["teams"])) + "**"
             return
 
         # We could be replacing an existing thing, so wipe for this guild!
@@ -112,11 +112,13 @@ class FicPoster(commands.Cog):
             "teams": teams
         }
         self.posting["post_channels"] += [ data ]
+        for team in teams:
+            self.channel_posts[team] += [ chan ]
 
         self.write_file()
-        string = "This channel is now subscribed for alerts for teams: " + ", ".join(teams)
+        string = "This channel is now subscribed for alerts for teams: **" + "**, **".join(teams) + "**"
         if len(unrecognized) > 0:
-            string += "\n\nUnfortunately, I didn't recognize: " + ", ".join(unrecognized)
+            string += "\n\nUnfortunately, I didn't recognize: **" + "**, **".join(unrecognized) + "**"
         await ctx.send(string)
 
 
@@ -142,4 +144,7 @@ class FicPoster(commands.Cog):
                     chans += [j]
 
         for chan in chans:
-            await ctx.send("I'm posting here because of a %pingchannels command!")
+            await chan.send("I'm posting here because of a %pingchannels command!")
+        
+        if len(chans) == 0:
+            await ctx.send("Seems there are no subscribed channels")
