@@ -113,7 +113,7 @@ class FicPoster(commands.Cog):
         }
         self.posting["post_channels"] += [ data ]
         for team in teams:
-            self.channel_posts[team] += [ chan ]
+            self.channel_posts[team] += [ ctx.channel ]
 
         self.write_file()
         string = "This channel is now subscribed for alerts for teams: **" + "**, **".join(teams) + "**"
