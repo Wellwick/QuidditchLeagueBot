@@ -170,16 +170,26 @@ class FicPoster(commands.Cog):
     async def check_for_fics(self):
         await self.bot.wait_until_ready()
         await self.setup_post_channels()
+        failures = 0
         while(True):
-            # Something
-            fics = self.mail.get_latest()
-            if len(fics) > 0:
-                print("Outputting " + str(len(fics)) + " fics")
-            for fic in fics:
-                info = self.parser.get_ql_fic(fic["id"], fic["chapter"])
-                print("Info collected!")
-                emb = self.parser.get_embed(info)
-                print(str(info))
-                if emb != None:
-                    await self.send_notifications(info["team"], emb)
+            try:
+                fics = self.mail.get_latest()
+                if len(fics) > 0:
+                    print("Outputting " + str(len(fics)) + " fics")
+                for fic in fics:
+                    info = self.parser.get_ql_fic(fic["id"], fic["chapter"])
+                    print("Info collected!")
+                    emb = self.parser.get_embed(info)
+                    print(str(info))
+                    if emb != None:
+                        await self.send_notifications(info["team"], emb)
+                failures = 0
+            except:
+                print("Failed to get emails!")
+                failures += 1
+                if failures == 120:
+                    # 2 hours of failure in a row means bad news, PM Wellwick
+                    creator = await self.bot.fetch_user(227834498019098624)
+                    await creator.send("I have been failing to get emails for two hours straight. Woo!")
+
             await asyncio.sleep(60)
