@@ -8,7 +8,6 @@ import discord, git
 from discord.ext import commands
 import asyncio, sys
 import sheets
-import ficparser
 import ficposter
 
 '''My (Quidditch League Bot's) Main Script

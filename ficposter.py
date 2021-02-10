@@ -3,6 +3,7 @@ import json
 import difflib
 import ficmail
 import ficparser
+import asyncio
 
 class FicPoster(commands.Cog):
     def __init__(self, bot):
