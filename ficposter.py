@@ -172,6 +172,8 @@ class FicPoster(commands.Cog):
             try:
                 # Something
                 fics = self.mail.get_latest()
+                if len(fics) > 0:
+                    print("Outputting " + str(len(fics)) + " fics")
                 for fic in fics:
                     info = self.parser.get_ql_fic(id, chapter)
                     emb = self.parser.get_embed(info)

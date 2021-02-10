@@ -25,6 +25,8 @@ class FicMail():
         if not "count" in self.info:
             self.info["count"] = len(self.pop_conn.list()[1])
 
+        print("Current count of emails is " + str(self.info["count"]))
+
     def get_latest(self):
         """
             Checks how many emails have been received since the last check and,
@@ -35,6 +37,7 @@ class FicMail():
         if self.info["count"] == email_count:
             return latest_emails
         
+        print("Have some new emails!")
         # If we've got to this point, we need to read some emails.
         # They might not be from fanfiction.net though
         messages = [pop_conn.retr(i) for i in range(self.info["count"], email_count + 1)]
@@ -65,8 +68,8 @@ class FicMail():
                     "id": storyid,
                     "chapter": chapter
                 }]
-        self.info["count"] = email_count
-        with open("email-info.json", "r") as email_info_file:
+        self.info["count"] = email_count + 1
+        with open("email-info.json", "w") as email_info_file:
             json.dump(self.info, email_info_file)
         # This is not the end of the work, but it is all that will be done in
         # this class. The parsing of the information will have to be done
