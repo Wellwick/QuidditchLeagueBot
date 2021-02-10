@@ -119,14 +119,28 @@ class FicParser(commands.Cog):
             local = r_text[pos:]
             pos = local.find(":")
             if pos != -1:
-                info["wordcount"] = local[pos+1:].split()[0].strip()
-        pos = r_text.find("wordcount")
-        if pos != -1:
-            pos += 9
-            local = r_text[pos:]
-            pos = local.find(":")
+                info["wordcount"] = local[pos+1:].strip().split()[0]
+            else:
+                info["wordcount"] = local.strip().split()[0]
+        else:
+            pos = r_text.find("wordcount")
             if pos != -1:
-                info["wordcount"] = local[pos+1:].split()[0].strip()
+                pos += 9
+                local = r_text[pos:]
+                pos = local.find(":")
+                if pos != -1:
+                    info["wordcount"] = local[pos+1:].strip().split()[0]
+                else:
+                    info["wordcount"] = local.strip().split()[0]
+            else:
+                pos = r_text.find("words:")
+                if pos != -1:
+                    pos += 6
+                    local = r_text[pos:]
+                    if pos != -1:
+                        info["wordcount"] = local[pos+1:].strip().split()[0]
+                    else:
+                        info["wordcount"] = local.strip().split()[0]
         
         if info["wordcount"] == "Unknown":
             # It wasn't an easy check, let's estimate
