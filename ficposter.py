@@ -38,11 +38,10 @@ class FicPoster(commands.Cog):
         for i in self.posting["post_channels"]:
             # These have a guild, channel id and list of teams that we must
             # resolve here
-            for guild in self.bot.guilds:
-                if guild.id == i["guild"]:
-                    chan = guild.get_channel(i["channel"])
-                    for team in i["teams"]:
-                        self.channel_posts[team] += [ chan ]
+            guild = self.bot.get_guild(i["guild"])
+            chan = guild.get_channel(i["channel"])
+            for team in i["teams"]:
+                self.channel_posts[team] += [ chan ]
 
     def write_file(self):
         """Write out the file so we can pick up later if the bot shutsdown
