@@ -42,6 +42,17 @@ class FicPoster(commands.Cog):
             chan = guild.get_channel(i["channel"])
             for team in i["teams"]:
                 self.channel_posts[team] += [ chan ]
+        
+        self.ready = False
+
+    async def setup_post_channels(self):
+        if self.ready:
+            return
+        for i in self.posting["post_channels"]:
+            chan = await self.bot.fetch_channel(i["channel"])
+            for team in i["teams"]:
+                self.channel_posts[team] += [ chan ]
+        self.ready = True
 
     def write_file(self):
         """Write out the file so we can pick up later if the bot shutsdown
@@ -81,6 +92,7 @@ class FicPoster(commands.Cog):
             e.g.
             %posthere Caerphilly Catapults, Puddlemere United, Unknown
         """
+        await self.setup_post_channels()
         if teams == "All Teams":
             teams = ", ".join(self.posting["teams"])
         if teams.strip().lower() == "list":
@@ -128,6 +140,7 @@ class FicPoster(commands.Cog):
         """
             Request that all posting to this server stops.
         """
+        await self.setup_post_channels()
         if self.clear_subscription(ctx.guild):
             self.write_file()
         else:
@@ -137,6 +150,7 @@ class FicPoster(commands.Cog):
     async def pingchannels(self, ctx, *args):
         """Pings all the subscribed channels, very annoying
         """
+        await self.setup_post_channels()
         chans = []
         for i in self.channel_posts:
             for j in self.channel_posts[i]:
