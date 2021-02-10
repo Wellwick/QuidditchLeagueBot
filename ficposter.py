@@ -174,7 +174,7 @@ class FicPoster(commands.Cog):
             if len(fics) > 0:
                 print("Outputting " + str(len(fics)) + " fics")
             for fic in fics:
-                info = self.parser.get_ql_fic(id, chapter)
+                info = self.parser.get_ql_fic(fic["id"], fic["chapter"])
                 emb = self.parser.get_embed(info)
                 if emb != None:
                     await self.send_notifications(info["team"], emb)
