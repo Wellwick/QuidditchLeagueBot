@@ -104,7 +104,8 @@ class FicPoster(commands.Cog):
                 # Couldn't guess
                 unrecognized += [ i.strip() ]
             else:
-                teams += [ closest_match[0] ]
+                if closest_match[0] not in teams:
+                    teams += [ closest_match[0] ]
         
         data = {
             "guild": ctx.guild.id,
