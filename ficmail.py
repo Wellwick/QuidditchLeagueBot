@@ -45,6 +45,7 @@ class FicMail():
         latest_emails = []
         email_count = len(self.pop_conn.list()[1])
         if self.info["count"] == email_count:
+            self.pop_conn.quit()
             return latest_emails
         
         print("Have some new emails!")
@@ -93,6 +94,7 @@ class FicMail():
                     }]
                 except:
                     # Unfortunately, bad parsing can happen...
+                    print("Failed to parse message with subject line: " + message['subject'])
                     pass
         print("Updating count")
         self.info["count"] = email_count
