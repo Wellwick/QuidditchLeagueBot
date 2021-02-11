@@ -9,6 +9,7 @@ from discord.ext import commands
 import asyncio, sys
 import sheets
 import ficposter
+import beta
 
 '''My (Quidditch League Bot's) Main Script
 I'm friendly, and I have commands to support the Quidditch League discord server
@@ -16,6 +17,7 @@ I'm friendly, and I have commands to support the Quidditch League discord server
 
 intents = discord.Intents.default()
 intents.members = True
+intents.reactions = True
 
 b = commands.Bot(command_prefix=('%'),  case_insensitive=True, intents=intents)
 
@@ -30,7 +32,7 @@ async def hi(ctx, *args):
 poster = ficposter.FicPoster(b)
 b.add_cog(poster)
 b.loop.create_task(poster.check_for_fics())
-
+b.add_cog(beta.Beta(b))
 
 with open('secret') as s:
     token = s.read()[:-1]
