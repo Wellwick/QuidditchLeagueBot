@@ -63,8 +63,9 @@ class FicMail():
         # Concat message pieces:
         messages = ["\n".join(mssg) for mssg in messages]
         #Parse message intom an email object:
-        messages = [parser.Parser().parsestr(mssg) for mssg in messages]
-        print("Messages parsed")
+        #messages = [parser.Parser().parsestr(mssg) for mssg in messages]
+        # We want raw messages for the way we do things!
+        print("Messages 'parsed'")
         for message in messages:
             if "Chapter:" in message['subject'] or "Story:" in message['subject']:
                 try:
@@ -108,6 +109,16 @@ class FicMail():
         self.pop_conn.quit()
         return latest_emails
 
+    def get_text(self, msg):
+        message = email.message_from_string(msg)
+        text = []
+        for part in message.walk():
+            # each part is a either non-multipart, or another multipart message
+            # that contains further parts... Message is organized like a tree
+            if part.get_content_type() == 'text/plain':
+                text += part.get_payload() # adds the raw text
+        return "\n".join(text)
+    
     # The next three methods are shamelessly stolen from 
     # https://www.code-learner.com/python-use-pop3-to-read-email-example/
     # Praise the real heroes
@@ -134,7 +145,7 @@ class FicMail():
         return value
 
     # variable indent_number is used to decide number of indent of each level in the mail multiple bory part.
-    def get_text(self, msg, indent_number=0):
+    def get_text_old(self, msg, indent_number=0):
         if indent_number == 0:
             # loop to retrieve from, to, subject from email header.
             for header in ['From', 'To', 'Subject']:
@@ -162,7 +173,7 @@ class FicMail():
                 #print('%spart %s' % (' ' * indent_number, n))
                 #print('%s--------------------' % (' ' * indent_number))
                 # print multiple part information by invoke print_info function recursively.
-                self.get_text(part, indent_number + 1)
+                self.get_text_old(part, indent_number + 1)
         # if not multiple part. 
         else:
             # get message content mime type
