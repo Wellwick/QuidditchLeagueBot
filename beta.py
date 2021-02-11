@@ -1,6 +1,7 @@
 from discord.ext import commands
 import json
 import discord
+from discord import Embed
 import random
 
 class Beta(commands.Cog):
