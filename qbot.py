@@ -26,7 +26,7 @@ poster = ficposter.FicPoster(b)
 beta_cog = beta.Beta(b)
 b.add_cog(poster)
 b.loop.create_task(poster.check_for_fics())
-b.add_cog()
+b.add_cog(beta_cog)
 
 @b.command()
 async def hi(ctx, *args):
