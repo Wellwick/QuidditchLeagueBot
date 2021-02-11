@@ -45,6 +45,7 @@ class FicMail():
         latest_emails = []
         email_count = len(self.pop_conn.list()[1])
         if self.info["count"] == email_count:
+            print("Disconnecting from email, no new emails!")
             self.pop_conn.quit()
             return latest_emails
         
