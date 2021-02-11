@@ -20,14 +20,14 @@ class Beta(commands.Cog):
 
         if "reacts" not in self.beta:
             self.beta["reacts"] = [
-                "+1",
-                "tada",
-                "partying-face",
-                "writing-hand",
-                "book",
-                "sparkles",
-                "confetti_ball",
-                "fire"
+                "👍",
+                "🎉",
+                "🥳",
+                "✍",
+                "📖",
+                "✨",
+                "🎊",
+                "🔥"
             ]
             needs_write = True
         
