@@ -6,18 +6,18 @@ import json
 
 class FicMail():
     def __init__(self):
-        SERVER = "pop.gmail.com"
+        self.SERVER = "pop.gmail.com"
         with open("email.json", "r") as email_file:
-            email_data = json.load(email_file)
+            self.email_data = json.load(email_file)
 
         # connect to server
-        print('connecting to ' + SERVER)
-        self.pop_conn = poplib.POP3_SSL(SERVER)
+        print('connecting to ' + self.SERVER)
+        self.pop_conn = poplib.POP3_SSL(self.SERVER)
 
         # login
         print('logging in')
-        self.pop_conn.user(email_data["USER"])
-        self.pop_conn.pass_(email_data["PASSWORD"])
+        self.pop_conn.user(self.email_data["USER"])
+        self.pop_conn.pass_(self.email_data["PASSWORD"])
 
         with open("email-info.json", "r") as email_info_file:
             self.info = json.load(email_info_file)
@@ -26,12 +26,22 @@ class FicMail():
             self.info["count"] = len(self.pop_conn.list()[1])
 
         print("Current count of emails is " + str(self.info["count"]))
+        print("Disconnecting from email")
+        self.pop_conn.quit()
 
     def get_latest(self):
         """
             Checks how many emails have been received since the last check and,
             if there are new ones, packed up the info of fic id and link.
         """
+        print('connecting to ' + self.SERVER)
+        self.pop_conn = poplib.POP3_SSL(self.SERVER)
+
+        # login
+        print('logging in')
+        self.pop_conn.user(self.email_data["USER"])
+        self.pop_conn.pass_(self.email_data["PASSWORD"])
+
         latest_emails = []
         email_count = len(self.pop_conn.list()[1])
         if self.info["count"] == email_count:
@@ -60,12 +70,23 @@ class FicMail():
                     # Get the fanfiction page address
                     text = self.get_text(message)
                     index = text.index("https://www.fanfiction.net/s/")
+                    if index == -1:
+                        # Sometimes it randomly sends a http instead!
+                        index = text.index("https://www.fanfiction.net/s/")
                     text = text[index:]
                     index = text.index("\n")
                     text = text[:index]
                     split = text.split("/")
                     storyid = split[4]
-                    chapter = split[5]
+                    if len(split) > 5:
+                        chapter = split[5]
+                    else:
+                        # In only one occurance, it can for some reason not include a chapter
+                        chapter = "1"
+                    try:
+                        int(chapter.strip())
+                    except:
+                        chapter = "1"
                     latest_emails += [ {
                         "id": storyid,
                         "chapter": chapter
@@ -80,6 +101,8 @@ class FicMail():
         # This is not the end of the work, but it is all that will be done in
         # this class. The parsing of the information will have to be done
         # elsewhere!
+        print("Disconnecting from email")
+        self.pop_conn.quit()
         return latest_emails
 
     # The next three methods are shamelessly stolen from 
