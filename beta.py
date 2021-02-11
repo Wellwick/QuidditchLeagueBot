@@ -95,6 +95,10 @@ class Beta(commands.Cog):
         if message.author.id != self.bot.user.id:
             return
 
+        # Don't care if the bot is reacting...
+        if payload.member.id == self.bot.user.id:
+            return
+
         # We only use unicode emojis so...
         if not payload.emoji.is_unicode_emoji():
             return
@@ -111,7 +115,7 @@ class Beta(commands.Cog):
                 continue
             for j in i["messages"]:
                 if j == message.id:
-                    if payload.member.mention not in j["betas"]:
+                    if payload.member.mention not in i["betas"]:
                         j["betas"] += [payload.member.mention]
                         await self.check_beta_complete(i, channel)
                         return
