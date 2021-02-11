@@ -116,7 +116,7 @@ class Beta(commands.Cog):
             for j in i["messages"]:
                 if j == message.id:
                     if payload.member.mention not in i["betas"]:
-                        j["betas"] += [payload.member.mention]
+                        i["betas"] += [payload.member.mention]
                         await self.check_beta_complete(i, channel)
                         return
 
