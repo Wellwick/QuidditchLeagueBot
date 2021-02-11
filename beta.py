@@ -97,7 +97,7 @@ class Beta(commands.Cog):
             link = "http" + "http".join(info[1:])
             separated = link.split()
             link = separated[0]
-            info = " ".separated[1:]
+            info = " ".join(separated[1:])
             reaction = self.pick_reaction(ctx.guild.id)
             story = self.story(ctx.author.mention, title, link, info, reaction)
             
