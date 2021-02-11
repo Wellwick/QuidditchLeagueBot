@@ -62,12 +62,14 @@ class FicMail():
         messages = n_messages
         # Concat message pieces:
         messages = ["\n".join(mssg) for mssg in messages]
-        #Parse message intom an email object:
-        #messages = [parser.Parser().parsestr(mssg) for mssg in messages]
         # We want raw messages for the way we do things!
         print("Messages 'parsed'")
         for message in messages:
-            if "Chapter:" in message['subject'] or "Story:" in message['subject']:
+            # We do need to have the messages parsed as well so we can look at
+            # the subject line
+            # Parse message in to an email object:
+            p_message = parser.Parser().parsestr(message)
+            if "Chapter:" in p_message['subject'] or "Story:" in p_message['subject']:
                 try:
                     # Should also make sure it's from the bot, but not for now
                     # Get the fanfiction page address
