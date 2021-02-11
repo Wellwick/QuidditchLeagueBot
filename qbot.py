@@ -34,7 +34,7 @@ async def hi(ctx, *args):
     '''
     await ctx.send('Hi, <@' + str(ctx.author.id) + '>!')
 
-@b.event()
+@b.event
 async def on_raw_reaction_add(payload):
     # We only care about this if it is for a message id that we can find
     # in our list of
