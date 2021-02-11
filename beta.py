@@ -37,7 +37,7 @@ class Beta(commands.Cog):
         self.bot = bot
 
     def write_data(self):
-        with open("beta_data.json", "w") as beta_datafile:
+        with open("beta-data.json", "w") as beta_datafile:
             json.dump(self.beta, beta_datafile)
 
     def story_id(self, story):
