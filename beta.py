@@ -69,12 +69,10 @@ class Beta(commands.Cog):
         self.beta["data"][guild_id] += [story]
         self.write_data()
 
-    @client.event
     async def on_raw_reaction_add(payload):
         # We only care about this if it is for a message id that we can find
         # in our list of
         pass
-
 
     @commands.command()
     async def beta(self, ctx, *, args=""):

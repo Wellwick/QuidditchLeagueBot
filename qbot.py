@@ -21,18 +21,24 @@ intents.reactions = True
 
 b = commands.Bot(command_prefix=('%'),  case_insensitive=True, intents=intents)
 
+# This will also add the FicParser cog itself!
+poster = ficposter.FicPoster(b)
+beta_cog = beta.Beta(b)
+b.add_cog(poster)
+b.loop.create_task(poster.check_for_fics())
+b.add_cog()
+
 @b.command()
 async def hi(ctx, *args):
     '''The hi command. I'll greet the user.
     '''
     await ctx.send('Hi, <@' + str(ctx.author.id) + '>!')
 
-
-# This will also add the FicParser cog itself!
-poster = ficposter.FicPoster(b)
-b.add_cog(poster)
-b.loop.create_task(poster.check_for_fics())
-b.add_cog(beta.Beta(b))
+@b.event()
+async def on_raw_reaction_add(payload):
+    # We only care about this if it is for a message id that we can find
+    # in our list of
+    await beta_cog.on_raw_reaction_add(payload)
 
 with open('secret') as s:
     token = s.read()[:-1]
