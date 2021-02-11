@@ -90,7 +90,8 @@ class Beta(commands.Cog):
         # in our list of tracked messages
         if payload.event_type != "REACTION_ADD":
             return
-        message = await self.bot.fetch_message(payload.message_id)
+        channel = await self.bot.fetch_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
         if message.author.id != self.bot.user.id:
             return
 
@@ -112,7 +113,7 @@ class Beta(commands.Cog):
                 if j == message.id:
                     if payload.member.mention not in j["betas"]:
                         j["betas"] += [payload.member.mention]
-                        await self.check_beta_complete(i, message.channel)
+                        await self.check_beta_complete(i, channel)
                         return
 
     @commands.command()
