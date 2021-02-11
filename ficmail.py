@@ -74,7 +74,7 @@ class FicMail():
                     index = text.index("https://www.fanfiction.net/s/")
                     if index == -1:
                         # Sometimes it randomly sends a http instead!
-                        index = text.index("https://www.fanfiction.net/s/")
+                        index = text.index("http://www.fanfiction.net/s/")
                     text = text[index:]
                     index = text.index("\n")
                     text = text[:index]
