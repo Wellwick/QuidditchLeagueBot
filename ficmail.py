@@ -2,6 +2,7 @@ import poplib
 from email import parser
 from email.header import decode_header
 from email.utils import parseaddr
+import email
 import json
 
 class FicMail():
@@ -74,13 +75,11 @@ class FicMail():
                     # Should also make sure it's from the bot, but not for now
                     # Get the fanfiction page address
                     text = self.get_text(message)
-                    index = text.index("https://www.fanfiction.net/s/")
+                    index = text.find("https://www.fanfiction.net/s/")
                     if index == -1:
                         # Sometimes it randomly sends a http instead!
                         index = text.index("http://www.fanfiction.net/s/")
-                    text = text[index:]
-                    index = text.index("\n")
-                    text = text[:index]
+                    text = text[index:].split("\n")[0]
                     split = text.split("/")
                     storyid = split[4]
                     if len(split) > 5:
@@ -98,7 +97,7 @@ class FicMail():
                     }]
                 except:
                     # Unfortunately, bad parsing can happen...
-                    print("Failed to parse message with subject line: " + message['subject'])
+                    print("Failed to parse message with subject line: " + p_message['subject'])
                     pass
         print("Updating count")
         self.info["count"] = email_count
