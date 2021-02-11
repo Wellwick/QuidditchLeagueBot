@@ -9,11 +9,16 @@ class Beta(commands.Cog):
     """
     def __init__(self, bot):
         # Need to load in what betaing still needs doing
-        with open("beta_data.json", "r") as beta_datafile:
+        with open("beta-data.json", "r") as beta_datafile:
             self.beta = json.load(beta_datafile)
 
+        needs_write = False
+
         if "data" not in self.beta:
-            self.beta["data"] = []
+            self.beta["data"] = {}
+            needs_write = True
+
+        if "reacts" not in self.beta:
             self.beta["reacts"] = [
                 "+1",
                 "tada",
@@ -24,8 +29,10 @@ class Beta(commands.Cog):
                 "confetti_ball",
                 "fire"
             ]
+            needs_write = True
+        
+        if needs_write:
             self.write_data()
-
 
         self.bot = bot
 
@@ -107,11 +114,10 @@ class Beta(commands.Cog):
                 url=story["link"], 
                 description=story["info"] + "\n This story needs two betas for " + story["author"] + "!"
             )
-            emb.set_author(name=ctx.author.nick)
             emb.set_footer(text="React with :" + story["reaction"] + ": if you have beta'd this story!")
             message = await ctx.send(embed=emb)
             story["messages"] += [ message.id ]
-            message.add_reaction(story["reaction"])
+            await message.add_reaction(story["reaction"])
 
             # Make sure to add it to the info
             self.add_story(ctx.guild.id, story)
