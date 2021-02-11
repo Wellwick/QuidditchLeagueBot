@@ -64,7 +64,6 @@ class Beta(commands.Cog):
         if guild_id not in self.beta["data"]:
             return random.choice(reacts)
 
-        l_reacts = []
         for i in self.beta["data"][guild_id]:
             reacts.remove(i["reaction"])
 
@@ -77,10 +76,44 @@ class Beta(commands.Cog):
         self.beta["data"][guild_id] += [story]
         self.write_data()
 
-    async def on_raw_reaction_add(payload):
+    async def check_beta_complete(self, story, channel):
+        if len(story["betas"]) == 2:
+            # We need to message the author and the two betas
+            string = story["author"] + ", your story " + story["title"]
+            string += " has been beta'd by " + " and ".join(story["betas"])
+            await channel.send(string)
+            guild_id = channel.guild.id
+            self.beta["data"][guild_id].remove(story)
+
+    async def on_raw_reaction_add(self, payload):
         # We only care about this if it is for a message id that we can find
-        # in our list of
-        pass
+        # in our list of tracked messages
+        if payload.event_type != "REACTION_ADD":
+            return
+        message = await self.bot.fetch_message(payload.message_id)
+        if message.author.id != self.bot.user.id:
+            return
+
+        # We only use unicode emojis so...
+        if not payload.emoji.is_unicode_emoji():
+            return
+
+        guild_id = message.guild.id
+        if guild_id not in self.beta["data"]:
+            return
+        
+        # Work our way through, and we only want to check if it's the matching
+        # reaction
+        reaction = payload.emoji.name
+        for i in self.beta["data"][guild_id]:
+            if i["reaction"] != reaction:
+                continue
+            for j in i["messages"]:
+                if j == message.id:
+                    if payload.member.mention not in j["betas"]:
+                        j["betas"] += [payload.member.mention]
+                        await self.check_beta_complete(i, message.channel)
+                        return
 
     @commands.command()
     async def beta(self, ctx, *, args=""):
@@ -101,7 +134,7 @@ class Beta(commands.Cog):
 
             title = info[0].strip().title()
             if title == "":
-                title = ctx.author.nick + "'s Story"
+                title = ctx.author.name + "'s Story"
             link = "http" + "http".join(info[1:])
             separated = link.split()
             link = separated[0]
@@ -114,7 +147,7 @@ class Beta(commands.Cog):
                 url=story["link"], 
                 description=story["info"] + "\n This story needs two betas for " + story["author"] + "!"
             )
-            emb.set_footer(text="React with :" + story["reaction"] + ": if you have beta'd this story!")
+            emb.set_footer(text="React with " + story["reaction"] + " if you have beta'd this story!")
             message = await ctx.send(embed=emb)
             story["messages"] += [ message.id ]
             await message.add_reaction(story["reaction"])
