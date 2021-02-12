@@ -196,6 +196,7 @@ class FicPoster(commands.Cog):
                     if emb != None:
                         await self.send_notifications(info["team"], emb)
                 failures = 0
+                self.mail.messages_published()
             except:
                 print("Failed to get emails!")
                 failures += 1

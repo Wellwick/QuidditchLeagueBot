@@ -59,7 +59,7 @@ class FicMail():
         """
         new_stories = []
         history = self.gmail.users().history().list(userId='me', startHistoryId=self.tracked["historyId"]).execute()
-        if "history" not in history:
+        if "history" not in history or len(history["history"]) == 0:
             # This means there is no emails to process!
             # We aren't going to be acknowledging any stoppages of the service,
             # but who really cares? They aren't real and should only happen
@@ -101,9 +101,11 @@ class FicMail():
         # this class. The parsing of the information will have to be done
         # elsewhere!
         self.tracked["history"] = history["historyId"]
+        return new_stories
+
+    def messages_published(self):
         self.ack_messages()
         self.save_tracked()
-        return new_stories
 
     def callback(self, message):
         message.ack()
