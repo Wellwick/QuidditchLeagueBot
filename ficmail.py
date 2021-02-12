@@ -1,197 +1,129 @@
-import poplib
-from email import parser
-from email.header import decode_header
-from email.utils import parseaddr
+import os, pickle
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
 import email
+import base64
 import json
+from concurrent.futures import TimeoutError
+from google.cloud import pubsub_v1
 
 class FicMail():
     def __init__(self):
-        self.SERVER = "pop.gmail.com"
-        with open("email.json", "r") as email_file:
-            self.email_data = json.load(email_file)
+        with open('token.pickle', 'rb') as token:
+            self.creds = pickle.load(token)
 
-        # connect to server
-        print('connecting to ' + self.SERVER)
-        self.pop_conn = poplib.POP3_SSL(self.SERVER)
+        # This is just "id/chapter"
+        with open("tracked_stories.json", "r") as tracked:
+            self.tracked = json.load(tracked)
 
-        # login
-        print('logging in')
-        self.pop_conn.user(self.email_data["USER"])
-        self.pop_conn.pass_(self.email_data["PASSWORD"])
+        self.gmail = build('gmail', 'v1', credentials=creds)
+        request = {
+            'labelIds': ['INBOX'],
+            'topicName': 'projects/ultimate-realm-178810/topics/gmail'
+        }
+        # This following line will make the unacked message count rise!
+        results = self.refresh_watch()
+        if "historyId" not in self.tracked:
+            self.tracked["historyId"] = results["historyId"]
 
-        with open("email-info.json", "r") as email_info_file:
-            self.info = json.load(email_info_file)
+    def save_tracked(self):
+        with open("tracked_stories.json", "r") as tracked:
+            json.dump(self.tracked, tracked)
+
+    def add_story(self, s_list, id, chapter):
+        new_id = str(id) + "/" + str(chapter)
+        if new_id in self.tracked["data"]:
+            # We have already done this one before!
+            return s_list
         
-        if not "count" in self.info:
-            self.info["count"] = len(self.pop_conn.list()[1])
+        # We don't save tracked here because we know that this will happen just
+        # before things are sent off!
+        self.tracked["data"] += [new_id]
+        
+        # Not encountered duplicate, send it off!
+        s_list += [{
+            "id": id,
+            "chapter": chapter
+        }]
+        return s_list
 
-        print("Current count of emails is " + str(self.info["count"]))
-        print("Disconnecting from email")
-        self.pop_conn.quit()
+    def refresh_watch(self):
+        return self.gmail.users().watch(userId='me', body=request).execute()
 
     def get_latest(self):
         """
             Checks how many emails have been received since the last check and,
             if there are new ones, packed up the info of fic id and link.
         """
-        print('connecting to ' + self.SERVER)
-        self.pop_conn = poplib.POP3_SSL(self.SERVER)
-
-        # login
-        print('logging in')
-        self.pop_conn.user(self.email_data["USER"])
-        self.pop_conn.pass_(self.email_data["PASSWORD"])
-
-        latest_emails = []
-        email_count = len(self.pop_conn.list()[1])
-        if self.info["count"] == email_count:
-            print("Disconnecting from email, no new emails!")
-            self.pop_conn.quit()
-            return latest_emails
+        new_stories = []
+        history = self.gmail.users().history().list(userId='me', startHistoryId=self.tracked["historyId"]).execute()
+        if "history" not in history:
+            # This means there is no emails to process!
+            # We aren't going to be acknowledging any stoppages of the service,
+            # but who really cares? They aren't real and should only happen
+            # on expiry, which should only happen if the bot shuts down
+            self.tracked["history"] = history["historyId"]
+            return new_stories
         
-        print("Have some new emails!")
         # If we've got to this point, we need to read some emails.
-        # They might not be from fanfiction.net though
-        messages = [self.pop_conn.retr(i) for i in range(self.info["count"] + 1, email_count + 1)]
-        n_messages = []
-        for message in messages:
-            new = [mssg.decode("utf-8") for mssg in message[1]]
-            n_messages += [new]
-
-        print("Messages decoded")
-        messages = n_messages
-        # Concat message pieces:
-        messages = ["\n".join(mssg) for mssg in messages]
-        # We want raw messages for the way we do things!
-        print("Messages 'parsed'")
-        for message in messages:
-            # We do need to have the messages parsed as well so we can look at
-            # the subject line
-            # Parse message in to an email object:
-            p_message = parser.Parser().parsestr(message)
-            if "Chapter:" in p_message['subject'] or "Story:" in p_message['subject']:
-                try:
-                    # Should also make sure it's from the bot, but not for now
-                    # Get the fanfiction page address
-                    text = self.get_text(message)
-                    index = text.find("https://www.fanfiction.net/s/")
-                    if index == -1:
-                        # Sometimes it randomly sends a http instead!
-                        index = text.index("http://www.fanfiction.net/s/")
-                    text = text[index:].split("\n")[0]
-                    split = text.split("/")
+        # They might not be from fanfiction.net, but we can get the text from
+        # them and if it contains www.fanfiction.net/s/, we can assume it's for
+        # a story post!
+        print("Have some new emails!")
+        for i in history["history"]:
+            for j in i["messages"]:
+                message = self.gmail.users().messages().get(userId='me', id=j['id'], format="raw").execute()
+                msg_str = base64.urlsafe_b64decode(message['raw'].encode("ASCII")).decode("ASCII")
+                mime_msg = email.message_from_string(msg_str)
+                text = mime_msg.as_string()
+                text = text.split("\n")
+                for line in text:
+                    if "://www.fanfiction.net/s/" not in line:
+                        continue
+                    split = line.strip().split("/")
                     storyid = split[4]
                     if len(split) > 5:
                         chapter = split[5]
                     else:
                         # In only one occurance, it can for some reason not include a chapter
-                        chapter = "1"
+                        "chapter = 1"
                     try:
                         int(chapter.strip())
                     except:
                         chapter = "1"
-                    latest_emails += [ {
-                        "id": storyid,
-                        "chapter": chapter
-                    }]
-                except:
-                    # Unfortunately, bad parsing can happen...
-                    print("Failed to parse message with subject line: " + p_message['subject'])
-                    pass
-        print("Updating count")
-        self.info["count"] = email_count
-        with open("email-info.json", "w") as email_info_file:
-            json.dump(self.info, email_info_file)
+                    new_stories = self.add_story(new_stories, storyid, chapter)
+                    # We shouldn't have more than one link in an email
+                    break
+        
         # This is not the end of the work, but it is all that will be done in
         # this class. The parsing of the information will have to be done
         # elsewhere!
-        print("Disconnecting from email")
-        self.pop_conn.quit()
-        return latest_emails
+        self.tracked["history"] = history["historyId"]
+        self.save_tracked()
+        self.ack_messages()
+        return new_stories
 
-    def get_text(self, msg):
-        message = email.message_from_string(msg)
-        text = []
-        for part in message.walk():
-            # each part is a either non-multipart, or another multipart message
-            # that contains further parts... Message is organized like a tree
-            if part.get_content_type() == 'text/plain':
-                text += part.get_payload() # adds the raw text
-        return "\n".join(text)
-    
-    # The next three methods are shamelessly stolen from 
-    # https://www.code-learner.com/python-use-pop3-to-read-email-example/
-    # Praise the real heroes
+    def callback(self, message):
+        message.ack()
 
-    # check email content string encoding charset.
-    def guess_charset(self, msg):
-        # get charset from message object.
-        charset = msg.get_charset()
-        # if can not get charset
-        if charset is None:
-            # get message header content-type value and retrieve the charset from the value.
-            content_type = msg.get('Content-Type', '').lower()
-            pos = content_type.find('charset=')
-            if pos >= 0:
-                charset = content_type[pos + 8:].strip()
-        return charset
+    def ack_messages(self):
+        self.tracked["project-id"]
+        self.tracked["subscription-id"]
+        self.tracked["timeout"]
+        print("Building a subscriber client to acknowledge messages")
+        subscriber = pubsub_v1.SubscriberClient()
+        subscription_path = subscriber.subscription_path(self.tracked["project-id"], self.tracked["subscription-id"])
 
-    # The Subject of the message or the name contained in the Email is encoded string
-    # , which must decode for it to display properly, this function just provide the feature.
-    def decode_str(self, s):
-        value, charset = decode_header(s)[0]
-        if charset:
-            value = value.decode(charset)
-        return value
+        streaming_pull_future = subscriber.subscribe(subscription_path, callback=self.callback)
+        print(f"Listening for messages on {subscription_path} for " + str(self.tracked["timeout"]) + "seconds...\n")
+        with subscriber:
+            try:
+                # When `timeout` is not set, result() will block indefinitely,
+                # unless an exception is encountered first.
+                streaming_pull_future.result(timeout=timeout)
+            except TimeoutError:
+                streaming_pull_future.cancel()
 
-    # variable indent_number is used to decide number of indent of each level in the mail multiple bory part.
-    def get_text_old(self, msg, indent_number=0):
-        if indent_number == 0:
-            # loop to retrieve from, to, subject from email header.
-            for header in ['From', 'To', 'Subject']:
-                # get header value
-                value = msg.get(header, '')
-                if value:
-                    # for subject header.
-                    if header=='Subject':
-                        # decode the subject value
-                        value = self.decode_str(value)
-                    # for from and to header. 
-                    else:
-                        # parse email address
-                        hdr, addr = parseaddr(value)
-                        # decode the name value.
-                        name = self.decode_str(hdr)
-                        value = u'%s <%s>' % (name, addr)
-                #print('%s%s: %s' % (' ' * indent_number, header, value))
-        # if message has multiple part. 
-        if (msg.is_multipart()):
-            # get multiple parts from message body.
-            parts = msg.get_payload()
-            # loop for each part
-            for n, part in enumerate(parts):
-                #print('%spart %s' % (' ' * indent_number, n))
-                #print('%s--------------------' % (' ' * indent_number))
-                # print multiple part information by invoke print_info function recursively.
-                self.get_text_old(part, indent_number + 1)
-        # if not multiple part. 
-        else:
-            # get message content mime type
-            content_type = msg.get_content_type() 
-            # if plain text or html content type.
-            if content_type=='text/plain' or content_type=='text/html':
-                # get email content
-                content = msg.get_payload(decode=True)
-                # get content string charset
-                charset = self.guess_charset(msg)
-                # decode the content with charset if provided.
-                if charset:
-                    content = content.decode(charset)
-                return content
-                #print('%sText: %s' % (' ' * indent_number, content + '...'))
-            else:
-                pass
-                #print('%sAttachment: %s' % (' ' * indent_number, content_type))
+        print("Messages acknowledged!")
 
             
