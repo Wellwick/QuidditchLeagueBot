@@ -77,6 +77,17 @@ class FicParser(commands.Cog):
             "o_prompts": [],
             "wordcount": "Unknown"
         }
+
+        print("Checking for team")
+        lowest_pos = len(r_text)
+        for i in self.teams:
+            pos = r_text.find(i.lower())
+            if pos != -1 and pos < lowest_pos:
+                lowest_pos = pos
+                info["team"] = i
+                # If we find the name of a team, it's pretty unlikely it's not
+                # for QL
+                info["forql"] = True
         
         print("Checking for QL")
         for i in ["qlfc", "quidditch league"]:
@@ -96,14 +107,6 @@ class FicParser(commands.Cog):
             if pos != -1 and pos < lowest_pos:
                 lowest_pos = pos
                 info["position"] = i
-
-        print("Checking for team")
-        lowest_pos = len(r_text)
-        for i in self.teams:
-            pos = r_text.find(i.lower())
-            if pos != -1 and pos < lowest_pos:
-                lowest_pos = pos
-                info["team"] = i
 
         pos = r_text.find("round ")
         info["round"] = chapter.text[pos:].split("\n")[0]
