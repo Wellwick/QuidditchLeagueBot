@@ -152,7 +152,7 @@ class Beta(commands.Cog):
                     description = i["link"] + ": " + i["info"] + "\n"
                     description += "This story needs " + str(2 - len(i["betas"])) + " beta(s). "
                     description += "React with " + i["reaction"] + " if you have beta'd this story!"
-                    emb.add_field(name=i["title"], value=description, inline=False)
+                    emb.add_field(name=i["title"] + " by " i["author"]+ , value=description, inline=False)
                     reacts += [ i["reaction"] ]
                 message = await ctx.send(embed=emb)
                 for i in reacts:
