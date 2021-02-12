@@ -121,8 +121,8 @@ class Beta(commands.Cog):
                         return
 
     def get_stories(self, guild_id):
-        if guild_id in self.betas["data"]:
-            return self.betas["data"][guild_id]
+        if guild_id in self.beta["data"]:
+            return self.beta["data"][guild_id]
 
         return []
 
