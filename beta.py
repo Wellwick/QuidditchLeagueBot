@@ -120,6 +120,12 @@ class Beta(commands.Cog):
                         await self.check_beta_complete(i, channel)
                         return
 
+    def get_stories(self, guild_id):
+        if guild_id in self.betas["data"]:
+            return self.betas["data"][guild_id]
+
+        return []
+
     @commands.command()
     async def beta(self, ctx, *, args=""):
         """Used for asking for and listing betas
@@ -131,6 +137,29 @@ class Beta(commands.Cog):
         """
         if args == "" or args.lower() == "list":
             server_stories = self.get_stories(ctx.guild.id)
+            if len(server_stories) == 0:
+                await ctx.send("There are currently no stories waiting for beta-ing")
+            else:
+                description = "There are " + str(len(server_stories)) + " waiting for beta."
+                if len(server_stories) == 1:
+                    description = "There is 1 story waiting for beta."
+                emb = Embed(
+                    title="Stories waiting for betaing",
+                    description=description
+                )
+                reacts = []
+                for i in server_stories:
+                    description = i["link"] + ": " + i["info"] + "\n"
+                    description += "This story needs " + str(2 - len(i["betas"])) + " beta(s). "
+                    description += "React with " + i["reaction"] + " if you have beta'd this story!"
+                    emb.add_field(name=i["title"], value=description, inline=False)
+                    reacts += [ i["reaction"] ]
+                message = await ctx.send(embed=emb)
+                for i in reacts:
+                    await message.add_reaction(i)
+                
+                for i in server_stories:
+                    i["messages"] += [ message.id ]
         else:
             info = args.strip().split("http")
             if len(info) < 2:
