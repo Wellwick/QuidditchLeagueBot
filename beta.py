@@ -31,6 +31,13 @@ class Beta(commands.Cog):
             ]
             needs_write = True
         
+        # The guild IDs are meant to be integers
+        data = {}
+        for i in self.beta["data"]:
+            data[int(i)] = self.beta["data"][i]
+
+        self.beta["data"] = data
+
         if needs_write:
             self.write_data()
 
