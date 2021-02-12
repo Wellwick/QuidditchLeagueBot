@@ -64,7 +64,7 @@ class FicMail():
             # We aren't going to be acknowledging any stoppages of the service,
             # but who really cares? They aren't real and should only happen
             # on expiry, which should only happen if the bot shuts down
-            self.tracked["history"] = history["historyId"]
+            self.tracked["historyId"] = history["historyId"]
             return new_stories
         
         # If we've got to this point, we need to read some emails.
@@ -100,7 +100,7 @@ class FicMail():
         # This is not the end of the work, but it is all that will be done in
         # this class. The parsing of the information will have to be done
         # elsewhere!
-        self.tracked["history"] = history["historyId"]
+        self.tracked["historyId"] = history["historyId"]
         return new_stories
 
     def messages_published(self):
