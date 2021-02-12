@@ -18,7 +18,7 @@ class FicMail():
             self.tracked = json.load(tracked)
 
         self.gmail = build('gmail', 'v1', credentials=creds)
-        request = {
+        self.request = {
             'labelIds': ['INBOX'],
             'topicName': 'projects/ultimate-realm-178810/topics/gmail'
         }
@@ -49,7 +49,7 @@ class FicMail():
         return s_list
 
     def refresh_watch(self):
-        return self.gmail.users().watch(userId='me', body=request).execute()
+        return self.gmail.users().watch(userId='me', body=self.request).execute()
 
     def get_latest(self):
         """
