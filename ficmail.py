@@ -11,7 +11,7 @@ import asyncio
 class FicMail():
     def __init__(self):
         with open('token.pickle', 'rb') as token:
-            self.creds = pickle.load(token)
+            creds = pickle.load(token)
 
         # This is just "id/chapter"
         with open("tracked-stories.json", "r") as tracked:
