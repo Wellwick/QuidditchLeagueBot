@@ -6,6 +6,7 @@ import base64
 import json
 from concurrent.futures import TimeoutError
 from google.cloud import pubsub_v1
+import asyncio
 
 class FicMail():
     def __init__(self):
@@ -126,4 +127,10 @@ class FicMail():
 
         print("Messages acknowledged!")
 
+    async def refresh_watch_loop(self):
+        while True:
+            # The watch subscription expires after 7 days, so we can safely wait
+            # for 5 days and refresh
+            await asyncio.sleep(60*60*24*5)
+            self.refresh_watch()
             

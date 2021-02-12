@@ -42,6 +42,7 @@ class FicPoster(commands.Cog):
         self.mail = ficmail.FicMail()
         self.parser = ficparser.FicParser()
         self.bot.add_cog(self.parser)
+        self.bot.loop.create_task(self.mail.refresh_watch_loop())
 
     async def setup_post_channels(self):
         if self.ready:
