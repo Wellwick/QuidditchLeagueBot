@@ -125,6 +125,7 @@ class Beta(commands.Cog):
                     if payload.member.mention not in i["betas"]:
                         i["betas"] += [payload.member.mention]
                         await self.check_beta_complete(i, channel)
+                        self.write_data()
                         return
 
     def get_stories(self, guild_id):
