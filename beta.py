@@ -143,6 +143,11 @@ class Beta(commands.Cog):
         %beta Your title https://docs.google.com/document/d/id/edit Some extra details you want to provide
         The only bit you must provide is the link, because it helps people find your stuff.
         """
+        # Only permissible in Omnioculars channel
+        # Only permissible in Omnioculars channel
+        if ctx.guild.id == 798284145356046346 and ctx.channel.id != 809165162417750106:
+            await ctx.send("Bot commands not allowed here! Please do in #omnioculars!")
+            return
         if args == "" or args.lower() == "list":
             server_stories = self.get_stories(ctx.guild.id)
             if len(server_stories) == 0:

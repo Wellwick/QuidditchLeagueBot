@@ -32,6 +32,10 @@ b.add_cog(beta_cog)
 async def hi(ctx, *args):
     '''The hi command. I'll greet the user.
     '''
+    # Only permissible in Omnioculars channel
+    if ctx.guild.id == 798284145356046346 and ctx.channel.id != 809165162417750106:
+        await ctx.send("Bot commands not allowed here! Please do in #omnioculars!")
+        return
     await ctx.send('Hi, <@' + str(ctx.author.id) + '>!')
 
 @b.event

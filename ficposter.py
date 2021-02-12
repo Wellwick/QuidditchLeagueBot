@@ -90,6 +90,10 @@ class FicPoster(commands.Cog):
             e.g.
             %posthere Caerphilly Catapults, Puddlemere United, Unknown
         """
+        # Only permissible in Omnioculars channel
+        if ctx.guild.id == 798284145356046346 and ctx.channel.id != 809165162417750106:
+            await ctx.send("Bot commands not allowed here! Please do in #omnioculars!")
+            return
         await self.setup_post_channels()
         if teams == "All Teams":
             teams = ", ".join(self.posting["teams"])
@@ -136,6 +140,10 @@ class FicPoster(commands.Cog):
         """
             Request that all posting to this server stops.
         """
+        # Only permissible in Omnioculars channel
+        if ctx.guild.id == 798284145356046346 and ctx.channel.id != 809165162417750106:
+            await ctx.send("Bot commands not allowed here! Please do in #omnioculars!")
+            return
         await self.setup_post_channels()
         if self.clear_subscription(ctx.guild):
             self.write_file()

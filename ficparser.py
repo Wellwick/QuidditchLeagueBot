@@ -183,6 +183,10 @@ class FicParser(commands.Cog):
             Takes an input and tries to get what the the season, round, prompts,
             word count, position, team
         """
+        # Only permissible in Omnioculars channel
+        if ctx.guild.id == 798284145356046346 and ctx.channel.id != 809165162417750106:
+            await ctx.send("Bot commands not allowed here! Please do in #omnioculars!")
+            return
         info = self.get_ql_fic(id, chapter)
         emb = self.get_embed(info)
         if emb != None:
