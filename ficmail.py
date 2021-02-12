@@ -46,6 +46,7 @@ class FicMail():
             "id": id,
             "chapter": chapter
         }]
+        print("Added new story " + new_id)
         return s_list
 
     def refresh_watch(self):
@@ -100,8 +101,8 @@ class FicMail():
         # this class. The parsing of the information will have to be done
         # elsewhere!
         self.tracked["history"] = history["historyId"]
-        self.save_tracked()
         self.ack_messages()
+        self.save_tracked()
         return new_stories
 
     def callback(self, message):
@@ -116,12 +117,12 @@ class FicMail():
         subscription_path = subscriber.subscription_path(self.tracked["project-id"], self.tracked["subscription-id"])
 
         streaming_pull_future = subscriber.subscribe(subscription_path, callback=self.callback)
-        print(f"Listening for messages on {subscription_path} for " + str(self.tracked["timeout"]) + "seconds...\n")
+        print(f"Listening for messages on {subscription_path} for " + str(self.tracked["timeout"]) + " seconds...\n")
         with subscriber:
             try:
                 # When `timeout` is not set, result() will block indefinitely,
                 # unless an exception is encountered first.
-                streaming_pull_future.result(timeout=timeout)
+                streaming_pull_future.result(timeout=self.tracked["timeout"])
             except TimeoutError:
                 streaming_pull_future.cancel()
 
