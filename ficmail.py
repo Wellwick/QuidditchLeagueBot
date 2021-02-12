@@ -14,7 +14,7 @@ class FicMail():
             self.creds = pickle.load(token)
 
         # This is just "id/chapter"
-        with open("tracked_stories.json", "r") as tracked:
+        with open("tracked-stories.json", "r") as tracked:
             self.tracked = json.load(tracked)
 
         self.gmail = build('gmail', 'v1', credentials=creds)
@@ -28,7 +28,7 @@ class FicMail():
             self.tracked["historyId"] = results["historyId"]
 
     def save_tracked(self):
-        with open("tracked_stories.json", "r") as tracked:
+        with open("tracked-stories.json", "w") as tracked:
             json.dump(self.tracked, tracked)
 
     def add_story(self, s_list, id, chapter):

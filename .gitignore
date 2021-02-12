@@ -131,3 +131,4 @@ dmypy.json
 # Bot specific things
 secret
 *.json
+token.pickle
