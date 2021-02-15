@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord import Embed
 from ff.fiction import Story, Chapter, User
 import re
+import asyncio
 
 class FicParser(commands.Cog):
     def __init__(self):
@@ -50,7 +51,7 @@ class FicParser(commands.Cog):
         }
         self.prompt_re = re.compile(".*(\[|\()[a-z]+(\]|\)).*")
 
-    def get_ql_fic(self, id, chap):
+    async def get_ql_fic(self, id, chap):
         print("Getting story " + str(id))
         story = Story(id=int(id))
         # Because access to fanfiction.net is kind of garbage, let's make 5 
@@ -62,6 +63,7 @@ class FicParser(commands.Cog):
                 attempts = 5
             except:
                 attempts += 1
+                await asyncio.sleep(1)
         author = User(id=story.author_id)
         attempts = 0
         while attempts < 5:
@@ -70,6 +72,7 @@ class FicParser(commands.Cog):
                 attempts = 5
             except:
                 attempts += 1
+                await asyncio.sleep(1)
         print("Getting chapter " + str(chap))
         attempts = 0
         while attempts < 5:
@@ -78,6 +81,7 @@ class FicParser(commands.Cog):
                 attempts = 5
             except:
                 attempts += 1
+                await asyncio.sleep(1)
         # Now we have the information, it's time to get processing
         c_text = chapter.text.lower()
         print("Doing replacements")
@@ -213,7 +217,7 @@ class FicParser(commands.Cog):
         if ctx.guild.id == 798284145356046346 and ctx.channel.id != 809165162417750106:
             await ctx.send("Bot commands not allowed here! Please do in #omnioculars!")
             return
-        info = self.get_ql_fic(id, chapter)
+        info = await self.get_ql_fic(id, chapter)
         emb = self.get_embed(info)
         if emb != None:
             await ctx.send(embed=emb)
