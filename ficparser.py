@@ -53,11 +53,28 @@ class FicParser(commands.Cog):
     def get_ql_fic(self, id, chap):
         print("Getting story " + str(id))
         story = Story(id=int(id))
-        story.download_data()
+        # Because access to fanfiction.net is kind of garbage, let's make 5 
+        # attempts for each download before giving up!
+        attempts = 0
+        while attempts < 5:
+            try:
+                story.download_data()
+            except:
+                attempts += 1
         author = User(id=story.author_id)
-        author.download_data()
+        attempts = 0
+        while attempts < 5:
+            try:
+                author.download_data()
+            except:
+                attempts += 1
         print("Getting chapter " + str(chap))
-        chapter = Chapter(story_id=story.id, chapter=int(chap))
+        attempts = 0
+        while attempts < 5:
+            try:
+                chapter = Chapter(story_id=story.id, chapter=int(chap))
+            except:
+                attempts += 1
         # Now we have the information, it's time to get processing
         c_text = chapter.text.lower()
         print("Doing replacements")
@@ -90,7 +107,7 @@ class FicParser(commands.Cog):
                 info["forql"] = True
         
         print("Checking for QL")
-        for i in ["qlfc", "quidditch league"]:
+        for i in ["qlfc", "quidditch league", "quidditch fanfiction league"]:
             if i in c_text:
                 info["forql"] = True
             if i in story.description.lower():
@@ -112,7 +129,10 @@ class FicParser(commands.Cog):
         info["round"] = chapter.text[pos:].split("\n")[0]
         if info["round"] == "Unknown" or len(info["round"]) > 50:
             pos = r_text.find("prophet challenge")
-            info["round"] = chapter.text[pos:].split("\n")[0]
+            if pos != -1:
+                info["round"] = chapter.text[pos:].split("\n")[0]
+            else:
+                info["round"] = "Round Unknown"
 
         # The vast majority of people go
         # Word Count: nnnn
