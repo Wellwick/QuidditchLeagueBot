@@ -145,7 +145,7 @@ class Beta(commands.Cog):
         """
         # Only permissible in Omnioculars channel
         # Only permissible in Omnioculars channel
-        if ctx.guild.id == 798284145356046346 and ctx.channel.id != 809165162417750106:
+        if ctx.guild.id == 798284145356046346 and ctx.channel.id not in [809165162417750106, 798296311190519838]:
             await ctx.send("Bot commands not allowed here! Please do in #omnioculars!")
             return
         if args == "" or args.lower() == "list":
