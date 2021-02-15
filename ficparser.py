@@ -59,6 +59,7 @@ class FicParser(commands.Cog):
         while attempts < 5:
             try:
                 story.download_data()
+                attempts = 5
             except:
                 attempts += 1
         author = User(id=story.author_id)
@@ -66,6 +67,7 @@ class FicParser(commands.Cog):
         while attempts < 5:
             try:
                 author.download_data()
+                attempts = 5
             except:
                 attempts += 1
         print("Getting chapter " + str(chap))
@@ -73,6 +75,7 @@ class FicParser(commands.Cog):
         while attempts < 5:
             try:
                 chapter = Chapter(story_id=story.id, chapter=int(chap))
+                attempts = 5
             except:
                 attempts += 1
         # Now we have the information, it's time to get processing
