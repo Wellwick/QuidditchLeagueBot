@@ -75,7 +75,12 @@ class FicMail():
         for i in history["history"]:
             for j in i["messages"]:
                 message = self.gmail.users().messages().get(userId='me', id=j['id'], format="raw").execute()
-                msg_str = base64.urlsafe_b64decode(message['raw'].encode("ASCII")).decode("ASCII")
+                try:
+                    msg_str = base64.urlsafe_b64decode(message['raw'].encode("ASCII")).decode("ASCII")
+                except UnicodeDecodeError:
+                    # In some cases, ASCII decoding is horrible. I think this is because of
+                    # tabs, but decoding with utf-8 seems to deal with this
+                    msg_str = base64.urlsafe_b64decode(message['raw'].encode("ASCII")).decode("utf-8")
                 mime_msg = email.message_from_string(msg_str)
                 text = mime_msg.as_string()
                 text = text.split("\n")
@@ -88,7 +93,7 @@ class FicMail():
                         chapter = split[5]
                     else:
                         # In only one occurance, it can for some reason not include a chapter
-                        "chapter = 1"
+                        chapter = "1"
                     try:
                         int(chapter.strip())
                     except:
